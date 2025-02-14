@@ -15,19 +15,17 @@ public class ProdutoDao {
     public void save(Produto produto) {
         String sql = "INSERT INTO PRODUTO (NOME, VALOR_UNIT, QUANTIDADE) VALUES (?, ?, ?);";
 
-        try {
-            Connection connection = ConnectionHelper.getConnection();
-            PreparedStatement pst = connection.prepareStatement(sql);
+        try (Connection connection = ConnectionHelper.getConnection()) {
+            try (PreparedStatement pst = connection.prepareStatement(sql)) {
 
-            pst.setString(1, produto.getNome());
-            pst.setDouble(2, produto.getValorUnit());
-            pst.setDouble(3, produto.getQuantidade());
+                pst.setString(1, produto.getNome());
+                pst.setDouble(2, produto.getValorUnit());
+                pst.setDouble(3, produto.getQuantidade());
 
-            pst.execute();
-
-            pst.close();
-            connection.close();
-
+                pst.execute();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         } catch (ClassNotFoundException | SQLException e) {
             throw new RuntimeException(e);
         }
@@ -100,25 +98,6 @@ public class ProdutoDao {
             pst.setDouble(2, produto.getValorUnit());
             pst.setDouble(3, produto.getQuantidade());
             pst.setInt(4, produto.getId());
-
-            pst.executeUpdate();
-
-            pst.close();
-            connection.close();
-
-        } catch (ClassNotFoundException | SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void delete(int id) {
-        String sql = "DELETE FROM PRODUTO WHERE ID = ?;";
-
-        try {
-            Connection connection = ConnectionHelper.getConnection();
-            PreparedStatement pst = connection.prepareStatement(sql);
-
-            pst.setInt(1, id);
 
             pst.executeUpdate();
 

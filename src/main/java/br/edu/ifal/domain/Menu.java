@@ -175,11 +175,9 @@ public class Menu {
                 s.nextLine();
                 String option = s.nextLine().trim().toLowerCase();
                 if (!option.equalsIgnoreCase("s")) {
+                    System.out.println("Venda efetuada com sucesso.");
                     break;
                 }
-
-                System.out.println("Venda efetuada com sucesso.");
-
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

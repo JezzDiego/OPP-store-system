@@ -15,26 +15,30 @@ public class PedidoDao {
     public int save(Pedido pedido) {
         String sql = "INSERT INTO PEDIDO (CPF_CLIENTE_FK, CPF_FUNCIONARIO_FK, VALOR_TOTAL) VALUES (?, ?, ?);";
 
-        try {
-            Connection connection = ConnectionHelper.getConnection();
-            PreparedStatement pst = connection.prepareStatement(sql);
+        try (Connection connection = ConnectionHelper.getConnection()) {
+            int id;
+            try (PreparedStatement pst = connection.prepareStatement(sql)) {
 
-            pst.setString(1, pedido.getCpfCliente());
-            pst.setString(2, pedido.getCpfFuncionario());
-            pst.setDouble(3, pedido.getValorTotal());
+                pst.setString(1, pedido.getCpfCliente());
+                pst.setString(2, pedido.getCpfFuncionario());
+                pst.setDouble(3, pedido.getValorTotal());
 
-            pst.execute();
+                pst.execute();
 
-            pst.close();
+                pst.close();
 
-            sql = "SELECT LAST_INSERT_ID()";
-            pst = connection.prepareStatement(sql);
+                sql = "SELECT LAST_INSERT_ID()";
 
-            ResultSet rs = pst.executeQuery();
-            rs.next();
-            int id = rs.getInt(1);
-
-            connection.close();
+                try (PreparedStatement newPst = connection.prepareStatement(sql)) {
+                    ResultSet rs = newPst.executeQuery();
+                    rs.next();
+                    id = rs.getInt(1);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
 
             return id;
         } catch (ClassNotFoundException | SQLException e) {
